@@ -25,51 +25,39 @@ public class AccountService {
 
     public void process(Transaction transaction) {
 
-        if (transactionRepository
-                .existsByEventId(transaction.getEventId())) {
+        if (transactionRepository.existsByEventId(transaction.getEventId())) {
 
             return;
 
         }
-
+        transaction.setId(null);
         transactionRepository.save(transaction);
 
-        List<Transaction> transactions =
-                transactionRepository
-                        .findByAccountIdOrderByEventTimestampAsc(
-                                transaction.getAccountId());
+        List<Transaction> transactions = transactionRepository.findByAccountIdOrderByEventTimestampAsc(transaction.getAccountId());
 
-        Account account =
-                accountRepository.findById(
-                                transaction.getAccountId())
-                        .orElseGet(() -> {
+        Account account = accountRepository.findById(transaction.getAccountId()).orElseGet(() -> {
 
-                            Account a = new Account();
+            Account a = new Account();
 
-                            a.setAccountId(
-                                    transaction.getAccountId());
+            a.setAccountId(transaction.getAccountId());
 
-                            a.setBalance(BigDecimal.ZERO);
+            a.setBalance(BigDecimal.ZERO);
 
-                            return a;
+            return a;
 
-                        });
+        });
 
         BigDecimal balance = BigDecimal.ZERO;
 
         for (Transaction t : transactions) {
 
-            if ("DEPOSIT".equalsIgnoreCase(
-                    t.getType())) {
+            if ("DEPOSIT".equalsIgnoreCase(t.getType())) {
 
-                balance =
-                        balance.add(t.getAmount());
+                balance = balance.add(t.getAmount());
 
-            } else if ("WITHDRAW".equalsIgnoreCase(
-                    t.getType())) {
+            } else if ("WITHDRAW".equalsIgnoreCase(t.getType())) {
 
-                balance =
-                        balance.subtract(t.getAmount());
+                balance = balance.subtract(t.getAmount());
 
             }
 
@@ -83,11 +71,7 @@ public class AccountService {
 
     public Account getBalance(String id) {
 
-        return accountRepository.findById(id)
-                .orElseThrow(() ->
-                        new AccountNotFoundException(
-                                "Account not found: " + id
-                        ));
+        return accountRepository.findById(id).orElseThrow(() -> new AccountNotFoundException("Account not found: " + id));
 
     }
 
