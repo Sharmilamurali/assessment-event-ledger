@@ -14,52 +14,41 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AccountValidationTest {
 
-private Validator validator =
-Validation.buildDefaultValidatorFactory()
-.getValidator();
+    private Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
-@Test
-void invalidTransactionShouldFail(){
+    @Test
+    void invalidTransactionShouldFail() {
 
-Transaction transaction =
-new Transaction();
+        Transaction transaction = new Transaction();
 
-transaction.setEventId("");
+        transaction.setEventId("");
 
-transaction.setAccountId("");
+        transaction.setAccountId("");
 
-transaction.setAmount(null);
+        transaction.setAmount(null);
 
-Set<ConstraintViolation<Transaction>> violations =
-validator.validate(transaction);
+        Set<ConstraintViolation<Transaction>> violations = validator.validate(transaction);
 
-assertFalse(
-violations.isEmpty()
-);
+        assertFalse(violations.isEmpty());
 
-}
+    }
 
-@Test
-void validTransactionShouldPass(){
+    @Test
+    void validTransactionShouldPass() {
 
-Transaction transaction =
-new Transaction();
+        Transaction transaction = new Transaction();
 
-transaction.setEventId("EVT1");
+        transaction.setEventId("EVT1");
 
-transaction.setAccountId("ACC1");
+        transaction.setAccountId("ACC1");
 
-transaction.setAmount(
-new java.math.BigDecimal("100")
-);
+        transaction.setAmount(new java.math.BigDecimal("100"));
 
-Set<ConstraintViolation<Transaction>> violations =
-validator.validate(transaction);
+        transaction.setType("DEPOSIT");
 
-assertTrue(
-violations.isEmpty()
-);
+        Set<ConstraintViolation<Transaction>> violations = validator.validate(transaction);
 
-}
+        assertTrue(violations.isEmpty());
 
+    }
 }

@@ -10,9 +10,9 @@ import java.math.BigDecimal;
 @Data
 public class Account {
 
-@Id
-private String accountId;
+    @Id
+    private String accountId;
 
-private BigDecimal balance;
+    private BigDecimal balance;
 
 }

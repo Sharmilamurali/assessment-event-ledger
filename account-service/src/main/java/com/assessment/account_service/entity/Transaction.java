@@ -11,23 +11,23 @@ import java.time.Instant;
 @Data
 public class Transaction {
 
-@Id
-@GeneratedValue(strategy=GenerationType.IDENTITY)
-private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-@NotBlank(message="Event ID is required")
-private String eventId;
+    @NotBlank(message = "Event ID is required")
+    private String eventId;
 
-@NotBlank(message="Account ID is required")
-private String accountId;
+    @NotBlank(message = "Account ID is required")
+    private String accountId;
 
-@NotBlank(message="Transaction type is required")
-private String type;
+    @NotBlank(message = "Transaction type is required")
+    private String type;
 
-@NotNull(message="Amount is required")
-@Positive(message="Amount must be greater than zero")
-private BigDecimal amount;
+    @NotNull(message = "Amount is required")
+    @Positive(message = "Amount must be greater than zero")
+    private BigDecimal amount;
 
-private Instant eventTimestamp;
+    private Instant eventTimestamp;
 
 }

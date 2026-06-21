@@ -5,130 +5,88 @@ import com.assessment.account_service.entity.Transaction;
 import com.assessment.account_service.repository.AccountRepository;
 import com.assessment.account_service.repository.TransactionRepository;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import org.mockito.Mockito;
-
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class AccountServiceTest {
 
-@Test
-void depositTransaction_shouldIncreaseBalance(){
+    private AccountRepository accountRepository;
+    private TransactionRepository transactionRepository;
+    private AccountService service;
 
-AccountRepository accountRepository=
-Mockito.mock(AccountRepository.class);
+    @BeforeEach
+    void setup() {
 
-TransactionRepository transactionRepository=
-Mockito.mock(TransactionRepository.class);
+        accountRepository = mock(AccountRepository.class);
+        transactionRepository = mock(TransactionRepository.class);
 
-AccountService service=
-new AccountService(
-accountRepository,
-transactionRepository);
+        service = new AccountService(accountRepository, transactionRepository);
+    }
 
-Transaction transaction=new Transaction();
+    @Test
+    void depositTransaction_shouldIncreaseBalance() {
 
-transaction.setEventId("EVT001");
-transaction.setAccountId("ACC001");
-transaction.setType("DEPOSIT");
-transaction.setAmount(new BigDecimal("100"));
+        Account account = new Account();
+        account.setAccountId("123");
+        account.setBalance(BigDecimal.ZERO);
 
-Mockito.when(
-transactionRepository.existsByEventId("EVT001")
-)
-.thenReturn(false);
+        Transaction transaction = new Transaction();
 
-Account account=new Account();
+        transaction.setAccountId("123");
+        transaction.setAmount(BigDecimal.valueOf(100));
+        transaction.setType("DEPOSIT");
+        transaction.setEventId("event1");
 
-account.setAccountId("ACC001");
-account.setBalance(BigDecimal.ZERO);
+        when(transactionRepository.existsByEventId("event1")).thenReturn(false);
 
-Mockito.when(
-accountRepository.findById("ACC001")
-)
-.thenReturn(Optional.of(account));
+        when(transactionRepository.findByAccountIdOrderByEventTimestampAsc("123")).thenReturn(List.of(transaction));
 
-service.process(transaction);
+        when(accountRepository.findById("123")).thenReturn(Optional.of(account));
 
-assertEquals(
-new BigDecimal("100"),
-account.getBalance()
-);
+        when(accountRepository.save(any(Account.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-Mockito.verify(accountRepository)
-.save(account);
+        service.process(transaction);
 
-}
+        assertEquals(BigDecimal.valueOf(100), account.getBalance());
+    }
 
-@Test
-void duplicateTransaction_shouldNotProcessAgain(){
+    @Test
+    void duplicateTransaction_shouldNotProcessAgain() {
 
-AccountRepository accountRepository=
-Mockito.mock(AccountRepository.class);
 
-TransactionRepository transactionRepository=
-Mockito.mock(TransactionRepository.class);
+        Transaction transaction = new Transaction();
 
-AccountService service=
-new AccountService(
-accountRepository,
-transactionRepository);
+        transaction.setEventId("EVT001");
 
-Transaction transaction=new Transaction();
+        when(transactionRepository.existsByEventId("EVT001")).thenReturn(true);
 
-transaction.setEventId("EVT001");
+        service.process(transaction);
 
-Mockito.when(
-transactionRepository.existsByEventId("EVT001")
-)
-.thenReturn(true);
+        verify(transactionRepository, never()).save(transaction);
 
-service.process(transaction);
+    }
 
-Mockito.verify(
-transactionRepository,
-Mockito.never()
-)
-.save(transaction);
+    @Test
+    void getBalance_shouldReturnAccount() {
 
-}
+        Account account = new Account();
 
-@Test
-void getBalance_shouldReturnAccount(){
+        account.setAccountId("ACC001");
+        account.setBalance(new BigDecimal("500"));
 
-AccountRepository accountRepository=
-Mockito.mock(AccountRepository.class);
+        when(accountRepository.findById("ACC001")).thenReturn(Optional.of(account));
 
-TransactionRepository transactionRepository=
-Mockito.mock(TransactionRepository.class);
+        Account result = service.getBalance("ACC001");
 
-AccountService service=
-new AccountService(
-accountRepository,
-transactionRepository);
+        assertEquals(new BigDecimal("500"), result.getBalance());
 
-Account account=new Account();
-
-account.setAccountId("ACC001");
-account.setBalance(new BigDecimal("500"));
-
-Mockito.when(
-accountRepository.findById("ACC001")
-)
-.thenReturn(Optional.of(account));
-
-Account result=
-service.getBalance("ACC001");
-
-assertEquals(
-new BigDecimal("500"),
-result.getBalance()
-);
-
-}
+    }
 
 }
