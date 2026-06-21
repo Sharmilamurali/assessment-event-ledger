@@ -12,30 +12,30 @@ import java.util.UUID;
 @Component
 public class TraceIdFilter implements Filter {
 
-@Override
-public void doFilter(
-ServletRequest request,
-ServletResponse response,
-FilterChain chain)
-throws IOException, ServletException {
+    @Override
+    public void doFilter(
+            ServletRequest request,
+            ServletResponse response,
+            FilterChain chain)
+            throws IOException, ServletException {
 
-HttpServletRequest httpRequest =
-(HttpServletRequest) request;
+        HttpServletRequest httpRequest =
+                (HttpServletRequest) request;
 
-String traceId =
-UUID.randomUUID().toString();
+        String traceId =
+                UUID.randomUUID().toString();
 
-httpRequest.setAttribute(
-"TRACE_ID",
-traceId);
+        httpRequest.setAttribute(
+                "TRACE_ID",
+                traceId);
 
-System.out.println(
-"TRACE_ID : "+traceId);
+        System.out.println(
+                "TRACE_ID : " + traceId);
 
-chain.doFilter(
-request,
-response);
+        chain.doFilter(
+                request,
+                response);
 
-}
+    }
 
 }

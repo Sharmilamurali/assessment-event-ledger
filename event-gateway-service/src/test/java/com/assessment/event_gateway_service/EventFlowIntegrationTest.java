@@ -11,37 +11,37 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class EventFlowIntegrationTest {
 
-@Autowired
-private TestRestTemplate restTemplate;
+    @Autowired
+    private TestRestTemplate restTemplate;
 
-@Test
-void gatewayToAccountFlowTest(){
+    @Test
+    void gatewayToAccountFlowTest() {
 
-String request = """
-{
-"eventId":"EVT100",
-"accountId":"ACC100",
-"type":"DEPOSIT",
-"amount":100,
-"eventTimestamp":"2026-06-21T10:00:00Z"
-}
-""";
+        String request = """
+                {
+                "eventId":"EVT100",
+                "accountId":"ACC100",
+                "type":"DEPOSIT",
+                "amount":100,
+                "eventTimestamp":"2026-06-21T10:00:00Z"
+                }
+                """;
 
-HttpHeaders headers = new HttpHeaders();
-headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
-HttpEntity<String> entity =
-new HttpEntity<>(request,headers);
+        HttpEntity<String> entity =
+                new HttpEntity<>(request, headers);
 
-ResponseEntity<String> response =
-restTemplate.postForEntity(
-"/events",
-entity,
-String.class
-);
+        ResponseEntity<String> response =
+                restTemplate.postForEntity(
+                        "/events",
+                        entity,
+                        String.class
+                );
 
-assertNotNull(response.getBody());
+        assertNotNull(response.getBody());
 
-}
+    }
 
 }

@@ -6,55 +6,53 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class AccountCommunicationServiceTest {
 
-@Test
-void sendTransaction_success(){
+    @Test
+    void sendTransaction_success() {
 
-AccountClient client=Mockito.mock(AccountClient.class);
+        AccountClient client = Mockito.mock(AccountClient.class);
 
-AccountCommunicationService service=
-new AccountCommunicationService(client);
+        AccountCommunicationService service = new AccountCommunicationService(client);
 
-Event event=new Event();
-event.setEventId("EVT001");
-event.setAccountId("ACC001");
+        Event event = new Event();
+        event.setEventId("EVT001");
+        event.setAccountId("ACC001");
 
-assertDoesNotThrow(() ->
-service.send(event));
+        assertDoesNotThrow(() -> service.send(event));
 
-Mockito.verify(client)
-.sendTransaction("ACC001",event);
+        Mockito.verify(client).sendTransaction("ACC001", event);
+    }
 
-}
+    @Test
+    void fallback_returnsDefaultMessage() {
 
-@Test
-void sendTransaction_whenAccountServiceFails(){
+        AccountClient client = Mockito.mock(AccountClient.class);
 
-AccountClient client=Mockito.mock(AccountClient.class);
+        AccountCommunicationService service = new AccountCommunicationService(client);
 
-Mockito.doThrow(new RuntimeException("service down"))
-.when(client)
-.sendTransaction(Mockito.anyString(),Mockito.any(Event.class));
+        String result = service.fallback(new Event(), new RuntimeException("service down"));
 
-AccountCommunicationService service=
-new AccountCommunicationService(client);
+        assertEquals("Account service unavailable", result);
+    }
 
-Event event=new Event();
-event.setAccountId("ACC001");
+    @Test
+    void sendTransaction_whenAccountServiceFails() {
 
-try{
+        AccountClient client = Mockito.mock(AccountClient.class);
 
-service.send(event);
+        Mockito.doThrow(new RuntimeException("service down")).when(client).sendTransaction(Mockito.anyString(), Mockito.any(Event.class));
 
-}catch(Exception e){
+        AccountCommunicationService service = new AccountCommunicationService(client);
 
-assert(e.getMessage()
-.contains("Account service unavailable"));
+        Event event = new Event();
+        event.setAccountId("ACC001");
 
-}
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> service.send(event));
 
-}
-
+        assertEquals("service down", exception.getMessage());
+    }
 }

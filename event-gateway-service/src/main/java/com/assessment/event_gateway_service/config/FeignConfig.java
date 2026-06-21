@@ -9,17 +9,17 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class FeignConfig {
 
-@Bean
-public RequestInterceptor traceInterceptor(){
+    @Bean
+    public RequestInterceptor traceInterceptor() {
 
-return template -> {
+        return template -> {
 
-template.header(
-"X-TRACE-ID",
-"event-gateway");
+            template.header(
+                    "X-TRACE-ID",
+                    "event-gateway");
 
-};
+        };
 
-}
+    }
 
 }

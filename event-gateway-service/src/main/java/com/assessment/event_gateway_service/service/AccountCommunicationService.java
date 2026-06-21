@@ -13,18 +13,18 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AccountCommunicationService {
 
-private final AccountClient accountClient;
+    private final AccountClient accountClient;
 
-@CircuitBreaker(name="accountService",fallbackMethod="fallback")
-public String send(Event event){
+    @CircuitBreaker(name = "accountService", fallbackMethod = "fallback")
+    public String send(Event event) {
 
-return accountClient.sendTransaction(event.getAccountId(),event);
+        return accountClient.sendTransaction(event.getAccountId(), event);
 
-}
+    }
 
-public String fallback(Event event,Exception ex){
+    public String fallback(Event event, Exception ex) {
 
-return "Account service unavailable";
-}
+        return "Account service unavailable";
+    }
 
 }
